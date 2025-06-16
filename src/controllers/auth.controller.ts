@@ -84,7 +84,7 @@ export const handleSignUp = async (req: Request, res: Response): Promise<void> =
 export const handleSignOut = async (req: Request, res: Response) => {
     res.clearCookie("token", {
         httpOnly: true,
-        secure: true, // make sure to match what was set
+        secure: true, 
         sameSite: "strict",
         path: "/",
     });
