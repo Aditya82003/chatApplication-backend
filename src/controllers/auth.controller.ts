@@ -66,7 +66,11 @@ export const handleSignUp = async (req: Request, res: Response): Promise<void> =
         }
 
         const token = generateToken({ ...newUser })
-        res.cookie("token", token)
+        res.cookie("token", token,{
+            maxAge:7*24*60*60*60,
+            httpOnly:true
+
+        })
         res.status(200).json({
             message: "successful",
             id: token
