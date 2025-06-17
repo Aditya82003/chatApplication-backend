@@ -21,8 +21,12 @@ export const handleSignin = async (req: Request, res: Response): Promise<void> =
             res.status(400).json({ message: "Invalid credential" })
             return
         }
-        const token = generateToken({ ...user })
-        res.cookie("token", token)
+        const token = generateToken({ id: user._id.toString() })
+        res.cookie("token", token, {
+            httpOnly: true,
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+            secure: process.env.NODE_ENV === "production"
+        })
         res.status(200).json({
             message: "successful",
             id: token
@@ -43,13 +47,11 @@ export const handleSignUp = async (req: Request, res: Response): Promise<void> =
             return
         }
 
-
         const existinguser = await User.findOne({ email })
         if (existinguser) {
             res.status(400).json({ message: "Email already found" })
             return
         }
-
 
         const salt = await bcrypt.genSalt(10)
         const hashedPassword = await bcrypt.hash(password, salt)
@@ -65,10 +67,10 @@ export const handleSignUp = async (req: Request, res: Response): Promise<void> =
             return
         }
 
-        const token = generateToken({ ...newUser })
-        res.cookie("token", token,{
-            maxAge:7*24*60*60*60,
-            httpOnly:true
+        const token = generateToken({ id: newUser._id.toString() })
+        res.cookie("token", token, {
+            maxAge: 7 * 24 * 60 * 60 * 60,
+            httpOnly: true
 
         })
         res.status(200).json({
@@ -85,13 +87,21 @@ export const handleSignUp = async (req: Request, res: Response): Promise<void> =
 
 
 
-export const handleSignOut = async (req: Request, res: Response) => {
+export const handleSignOut = async (req: Request, res: Response): Promise<void> => {
     res.clearCookie("token", {
         httpOnly: true,
-        secure: true, 
+        secure: true,
         sameSite: "strict",
         path: "/",
     });
 
     res.status(200).json({ message: "Logged out successfully" });
+    return
+}
+
+
+export const handleUploadProfile = async (req: Request, res: Response) => {
+    console.log(req.user)
+    res.status(200).json({message:"ok"})
+
 }
