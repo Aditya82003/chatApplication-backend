@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import User from "../models/user.model";
 import bcrypt from 'bcrypt';
 import { generateToken } from "../utilities/jwt";
+import cloudinary from "../config/cloudinary";
 
 
 export const handleSignin = async (req: Request, res: Response): Promise<void> => {
@@ -100,8 +101,33 @@ export const handleSignOut = async (req: Request, res: Response): Promise<void> 
 }
 
 
-export const handleUploadProfile = async (req: Request, res: Response) => {
-    console.log(req.user)
-    res.status(200).json({message:"ok"})
+export const handleUploadProfile = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { profilePic } = req.body
+        const userId = req.user?._id
 
+        if (!profilePic) {
+            res.status(400).json({
+                message: "Profile pic not Found"
+            })
+            return
+        }
+        const uploadResponse = await cloudinary.uploader.upload(profilePic)
+        const updatedUser = await User.findByIdAndUpdate(userId, { profilePic: uploadResponse.secure_url }, { new: true })
+
+        if (!updatedUser) {
+            res.status(400).json({
+                message: "can't find the user after uploading file"
+            })
+            return
+        }
+        res.status(200).json({
+            message: "Profile Pic successfully Uploaded",
+            file: uploadResponse.secure_url
+        })
+    } catch (err) {
+        res.status(500).json({
+            message: "internal error"
+        })
+    }
 }
