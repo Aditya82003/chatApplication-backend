@@ -7,7 +7,7 @@ export const protectRoute = async (req: Request, res: Response, next: NextFuncti
     try {
         const { token } = req.cookies
         if (!token) {
-            res.status(400).json({message:"unavailable to find token "})
+            res.status(401).json({message:"Unauthorized - No Token Provided"})
             return
         }
         const decoded = verifyToken(token)
