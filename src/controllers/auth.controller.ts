@@ -76,7 +76,12 @@ export const handleSignUp = async (req: Request, res: Response): Promise<void> =
         })
         res.status(200).json({
             message: "successful",
-            id: token
+            user:{
+                _id:newUser._id,
+                fullName:newUser.fullName,
+                email:newUser.email, 
+                profile:newUser.profilePic || null
+            }
         })
 
 
