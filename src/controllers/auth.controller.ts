@@ -30,7 +30,12 @@ export const handleSignin = async (req: Request, res: Response): Promise<void> =
         })
         res.status(200).json({
             message: "successful",
-            id: token
+            user:{
+                _id:user._id,
+                fullName:user.fullName,
+                email:user.email, 
+                profile:user.profilePic || null
+            }
         })
 
     } catch (err) {
