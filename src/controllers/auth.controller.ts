@@ -30,11 +30,11 @@ export const handleSignin = async (req: Request, res: Response): Promise<void> =
         })
         res.status(200).json({
             message: "successful",
-            user:{
-                _id:user._id,
-                fullName:user.fullName,
-                email:user.email, 
-                profile:user.profilePic || null
+            user: {
+                _id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+                profile: user.profilePic || null
             }
         })
 
@@ -81,11 +81,11 @@ export const handleSignUp = async (req: Request, res: Response): Promise<void> =
         })
         res.status(200).json({
             message: "successful",
-            user:{
-                _id:newUser._id,
-                fullName:newUser.fullName,
-                email:newUser.email, 
-                profile:newUser.profilePic || null
+            user: {
+                _id: newUser._id,
+                fullName: newUser.fullName,
+                email: newUser.email,
+                profile: newUser.profilePic || null
             }
         })
 
@@ -114,15 +114,20 @@ export const handleSignOut = async (req: Request, res: Response): Promise<void> 
 export const handleUploadProfile = async (req: Request, res: Response): Promise<void> => {
     try {
         const { profilePic } = req.body
+        console.log(profilePic.slice(0, 30))
         const userId = req.user?._id
-
-        if (!profilePic) {
+        if (!profilePic || !userId) {
             res.status(400).json({
-                message: "Profile pic not Found"
+                message: "Profile pic or userId not Found"
             })
             return
         }
+        console.log("uploading to cloudinary")
         const uploadResponse = await cloudinary.uploader.upload(profilePic)
+        if (!uploadResponse?.secure_url) {
+         res.status(500).json({ message: "Cloudinary upload failed" });
+         return
+    }
         const updatedUser = await User.findByIdAndUpdate(userId, { profilePic: uploadResponse.secure_url }, { new: true })
 
         if (!updatedUser) {
@@ -133,7 +138,12 @@ export const handleUploadProfile = async (req: Request, res: Response): Promise<
         }
         res.status(200).json({
             message: "Profile Pic successfully Uploaded",
-            file: uploadResponse.secure_url
+            user: {
+                _id: updatedUser._id,
+                fullName: updatedUser.fullName,
+                email: updatedUser.email,
+                profile: updatedUser.profilePic
+            }
         })
     } catch (err) {
         res.status(500).json({
@@ -142,12 +152,12 @@ export const handleUploadProfile = async (req: Request, res: Response): Promise<
     }
 }
 
-export const handleCheckAuth = async (req:Request,res:Response):Promise<void>=>{
-    try{
+export const handleCheckAuth = async (req: Request, res: Response): Promise<void> => {
+    try {
         res.status(200).json(req.user)
-    }catch(err){
+    } catch (err) {
         res.status(500).json({
-            message:"Interal server error"
+            message: "Interal server error"
         })
     }
 

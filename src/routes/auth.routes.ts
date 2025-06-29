@@ -8,7 +8,7 @@ router.post('/signin', handleSignin)
 router.post('/signup', handleSignUp)
 router.post('/signout', handleSignOut)
 
-router.get("/upload-profile", protectRoute, handleUploadProfile)
+router.put("/upload-profile", protectRoute, handleUploadProfile)
 
 router.get('/check',protectRoute,handleCheckAuth)
 
