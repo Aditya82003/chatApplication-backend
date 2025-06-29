@@ -102,7 +102,7 @@ export const handleSignOut = async (req: Request, res: Response): Promise<void> 
     res.clearCookie("token", {
         httpOnly: true,
         secure: true,
-        sameSite: "strict",
+        sameSite: "none",
         path: "/",
     });
 
