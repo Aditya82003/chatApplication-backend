@@ -16,7 +16,7 @@ export const handleGetAllUser = async (req: Request, res: Response): Promise<voi
         const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password")
         res.status(200).json({
             message: "Get users",
-            user: filteredUsers
+            users: filteredUsers
         })
     }
     catch (err) {
