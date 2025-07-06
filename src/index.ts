@@ -6,8 +6,9 @@ import messageRoutes from './routes/message.route'
 import { connectDB } from './config/db'
 import cookieParser from "cookie-parser";
 import cors from 'cors'
+import { app, server } from "./config/socket";
 
-const app = express()
+
 const PORT = process.env.PORT || 3001
 
 connectDB(process.env.MONGODB_URI as string)
@@ -26,4 +27,4 @@ app.use(cookieParser())
 app.use('/api/auth', authRoutes)
 app.use('/api/message',messageRoutes)
 
-app.listen(PORT, () => console.log(`Server is running at port ${PORT}`))
+server.listen(PORT, () => console.log(`Server is running at port ${PORT}`))
