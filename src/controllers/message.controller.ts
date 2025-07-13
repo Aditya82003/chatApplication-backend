@@ -3,6 +3,7 @@ import User from "../models/user.model";
 import Message from "../models/message.model";
 import { send } from "process";
 import cloudinary from "../config/cloudinary";
+import { getReceiverSocketId, io } from "../config/socket";
 
 export const handleGetAllUser = async (req: Request, res: Response): Promise<void> => {
     try {
@@ -90,6 +91,10 @@ export const handleSendMessage = async (req: Request, res: Response): Promise<vo
                 messagee: "Failed to send a message"
             })
             return
+        }
+        const receiverSocketId=getReceiverSocketId(receiverId)
+        if(receiverSocketId){
+            io.to(receiverSocketId).emit("newMessage",newMessage)
         }
         res.status(200).json({
             message: "Message sent successfully",

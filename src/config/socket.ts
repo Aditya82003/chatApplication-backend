@@ -22,6 +22,23 @@ io.on('connection', (socket) => {
     if (userId) userSocketMap[userId] = socket.id
     io.emit("getOnlineUsers", Object.keys(userSocketMap))
 
+    socket.on('join-room',({roomId,name})=>{
+        socket.join(roomId)
+        socket.to(roomId).emit('user-joined', `${name} has joined the room`)
+
+})
+    socket.on('send-message',({roomId,message})=>{
+        io.to(roomId).emit('receive-message',{
+            socket:socket.id,
+            message
+        })
+    })
+    socket.on('leave-room', ({roomId,name}) => {
+    socket.leave(roomId)
+    console.log(`${socket.id} left room ${roomId}`)
+    socket.to(roomId).emit('user-left', `${name} has left the room`)
+  })
+
     socket.on("disconnect", () => {
         console.log("A user disconnected", socket.id)
         if (userId) {
